@@ -17,8 +17,8 @@ export class ChainRunner extends ArrayVolume {
    * @param  {*} result 执行参数
    */
   run(result) {
-    return this.queue.reduce((cur, pre) => {
-      return cur(pre);
+    return this.queue.reduce((acc, cur, index) => {
+      return cur(acc);
     }, result);
   }
 }
