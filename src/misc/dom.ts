@@ -1,49 +1,46 @@
+type TJudgeCallback = (el: HTMLElement | null) => boolean;
+type TTimer = 'requestAnimationFrame' | 'setTimeout';
+
 /**
- *
- * @param {string} id 目标元素id
- * @param {?function} judgeCb 确定元素获取成功的judge函数
- * @param {?'requestAnimationFrame' | 'setTimeout'} type 轮询函数类型
- * @returns {promise}
+ * @description 获取一个dom节点
+ * @param id 
+ * @param judgeCb 
+ * @param type 
+ * @returns Promise<HTMLElement> 获取到的节点
  */
 export function requestDom(
-  id,
-  judgeCb = (el) => Boolean(el),
-  type = 'requestAnimationFrame'
-) {
-  function getDom(id, callback, type) {
-    if (document && window && window.requestAnimationFrame) {
-      const el = document.getElementById(id);
-
-      if (!judgeCb(el)) {
-        if (type === 'requestAnimationFrame') {
-          requestAnimationFrame(() => {
-            getDom(id, callback, type);
-          });
-        }
-        if (type === 'setTimeout') {
-          setTimeout(() => {
-            getDom(id, callback, type);
-          });
-        }
-      } else {
-        return callback(el);
-      }
-    } else {
-      throw Error("browser don't support");
-    }
-  }
-
-  let resolver;
+  id: string,
+  judgeCb: TJudgeCallback = (el) => Boolean(el),
+  type: TTimer = 'requestAnimationFrame'
+): Promise<HTMLElement> {
   return new Promise((resolve) => {
-    resolver = resolve;
-    getDom(
-      id,
-      (el) => {
-        setTimeout(() => {
-          resolver(el);
-        });
-      },
-      type
-    );
+    getDom(id, judgeCb, resolve, type);
   });
+}
+
+function getDom(
+  id: string,
+  judgeCb: TJudgeCallback,
+  callback: (el: HTMLElement) => void,
+  type: TTimer
+) {
+  if (document && window) {
+    const el = document.getElementById(id);
+    if (!judgeCb(el)) {
+      if (type === 'requestAnimationFrame') {
+        requestAnimationFrame(() => {
+          getDom(id, judgeCb, callback, type);
+        });
+      }
+      if (type === 'setTimeout') {
+        setTimeout(() => {
+          getDom(id, judgeCb, callback, type);
+        });
+      }
+    } else if (el) {
+      return callback(el);
+    }
+  } else {
+    throw Error("browser don't support");
+  }
 }

@@ -1,13 +1,20 @@
-type CancelFuc = () => void;
-interface IArrayVolume {
-  push<T>(callback: (param: T) => void, priority: number = 0): CancelFuc;
+export type IIGenericCallback<P1, P2, R> = (param1: P1, parma2: P2) => R;
+export type IGenericCallback<P, R> = (param: P) => R;
+
+export type CancelFuc = () => void;
+
+export type ChainCallback<T> = IGenericCallback<T, T>;
+
+interface IArrayVolume<T> {
+  push(callback: ChainCallback<T>, priority?: number): CancelFuc;
 }
 
-export class ArrayVolume implements IArrayVolume {
-  constructor(length: number) {
-    this.queue = length === void 0 ? [] : new Array(length);
+export class ArrayVolume<T extends Record<string, any>> implements IArrayVolume<T> {
+  protected queue: Array<ChainCallback<T>>;
+  constructor() {
+    this.queue = [];
   }
-  push<T>(callback: (param: T) => void,priority?: number): CancelFuc {
+  push(callback: ChainCallback<T>, priority: number = 1): CancelFuc {
     if (priority === 0) {
       this.queue.push(callback);
     }

@@ -1,5 +1,18 @@
 const _toString = Object.prototype.toString;
-const typeMap = {
+type ITypeMap = {
+  number: string;
+  string: string;
+  boolean: string;
+  undefined: string;
+  null: string;
+  object: string;
+  body: string;
+  element: RegExp;
+  regexp: string;
+  function: RegExp;
+  symbol: string;
+};
+const typeMap: ITypeMap = {
   number: '[object Number]',
   string: '[object String]',
   boolean: '[object Boolean]',
@@ -16,7 +29,7 @@ const typeMap = {
  * @param {*} t 待判断元素
  * @returns {boolean}
  */
-export function isString(t) {
+export function isString(t: any): boolean {
   return _toString.call(t) === typeMap.string;
 }
 
@@ -24,7 +37,7 @@ export function isString(t) {
  * @param {*} t 待判断元素
  * @returns {boolean}
  */
-export function isNumber(t) {
+export function isNumber(t: any): boolean {
   return _toString.call(t) === typeMap.number;
 }
 
@@ -32,7 +45,7 @@ export function isNumber(t) {
  * @param {*} t 待判断元素
  * @returns {boolean}
  */
-export function isBoolean(t) {
+export function isBoolean(t: any): boolean {
   return _toString.call(t) === typeMap.boolean;
 }
 

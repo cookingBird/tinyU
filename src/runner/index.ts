@@ -1,24 +1,23 @@
-import { ArrayVolume } from '../volume';
-export class ChainRunner extends ArrayVolume {
+import { ArrayVolume, CancelFuc } from '../volume';
+import type {  ChainCallback } from '../volume';
+
+interface IRunner<T> {
+  run(param: T): T;
+}
+
+export class ChainRunner<T extends Record<any, any>>
+  extends ArrayVolume<T>
+  implements IRunner<T>
+{
   constructor() {
     super();
   }
-  /**
-   * 加入一个回调函数到执行队列
-   * @param { Function } callback 回调函数
-   * @param { number } priority 优先级
-   * @returns { Function } remove函数 从队列中移除回调
-   */
-  push(callback) {
-    return super.push(callback, 1);
+  push(callback: ChainCallback<T>, priority?: number): CancelFuc {
+    return super.push(callback, priority);
   }
-  /**
-   * 链式执行回调队列中的回调函数
-   * @param  {*} result 执行参数
-   */
-  run(result) {
-    return this.queue.reduce((acc, cur, index) => {
+  run(param: T): T {
+    return this.queue.reduce((acc, cur) => {
       return cur(acc);
-    }, result);
+    }, param);
   }
 }
