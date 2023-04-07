@@ -3,13 +3,13 @@ type TTimer = 'requestAnimationFrame' | 'setTimeout';
 
 /**
  * @description 获取一个dom节点
- * @param id 
- * @param judgeCb 
- * @param type 
+ * @param id
+ * @param judgeCb
+ * @param type
  * @returns Promise<HTMLElement> 获取到的节点
  */
 export function requestDom(
-  id: string,
+  id: string | (() => unknown),
   judgeCb: TJudgeCallback = (el) => Boolean(el),
   type: TTimer = 'requestAnimationFrame'
 ): Promise<HTMLElement> {
@@ -19,13 +19,18 @@ export function requestDom(
 }
 
 function getDom(
-  id: string,
+  id: string | (() => unknown),
   judgeCb: TJudgeCallback,
   callback: (el: HTMLElement) => void,
   type: TTimer
 ) {
   if (document && window) {
-    const el = document.getElementById(id);
+    let el;
+    if (typeof id === 'string') {
+      el = document.getElementById(id);
+    } else {
+      el = id();
+    }
     if (!judgeCb(el)) {
       if (type === 'requestAnimationFrame') {
         requestAnimationFrame(() => {
@@ -37,7 +42,7 @@ function getDom(
           getDom(id, judgeCb, callback, type);
         });
       }
-    } else if (el) {
+    } else {
       return callback(el);
     }
   } else {
